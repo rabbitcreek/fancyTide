@@ -57,10 +57,7 @@ void setupTime() {
 
 void fetchTides() {
   HTTPClient http;
-  String url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=esp32tideclock&begin_date=today&range=24&station=";
-  url += stationId;
-  url += "&time_zone=lst_ldt&units=english&interval=hilo&format=json";
-
+String url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=today&station=9455920&product=predictions&datum=MLLW&time_zone=lst_ldt&interval=hilo&units=english&application=DataAPI_Sample&format=json";
   http.begin(url);
   int httpCode = http.GET();
 
@@ -133,13 +130,14 @@ void setup() {
   Serial.printf("Current time: %04d-%02d-%02d %02d:%02d:%02d\n",
                 lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
                 lt->tm_hour, lt->tm_min, lt->tm_sec);
-
+ fetchTides();
+ /*
   if (tideCount == 0 || storedDay != lt->tm_mday) {
     fetchTides();
   } else {
     loadStoredTides();
   }
-
+*/
   // Print all stored tide events
   Serial.println("Stored tide events:");
   for (int i = 0; i < tideCount; i++) {
@@ -169,7 +167,7 @@ void setup() {
   }
 
   // Sleep for 1 hour
-  esp_sleep_enable_timer_wakeup(3600ULL * 1000000ULL);
+  esp_sleep_enable_timer_wakeup(60ULL * 1000000ULL);
   Serial.println("Going to sleep...");
   delay(100);
   esp_deep_sleep_start();
