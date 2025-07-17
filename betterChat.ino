@@ -87,7 +87,7 @@ String url = "https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?date=tod
     time_t now = time(nullptr);
     struct tm* lt = localtime(&now);
     storedDay = lt->tm_mday;
-
+preferences.remove("tides");
     preferences.putBytes("tides", &tideEvents, sizeof(tideEvents));
     preferences.putInt("tideCount", tideCount);
     preferences.putInt("storedDay", storedDay);
@@ -131,6 +131,7 @@ void setup() {
                 lt->tm_year + 1900, lt->tm_mon + 1, lt->tm_mday,
                 lt->tm_hour, lt->tm_min, lt->tm_sec);
  fetchTides();
+ loadStoredTides();
  /*
   if (tideCount == 0 || storedDay != lt->tm_mday) {
     fetchTides();
@@ -153,21 +154,27 @@ void setup() {
   bool foundNext = false;
   for (int i = 0; i < tideCount; i++) {
     if (tideEvents[i].timestamp > now) {
+
       nextTide = tideEvents[i];
+      Serial.print("heyhotimes");
+      Serial.print(nextTide.timestamp);
       foundNext = true;
       break;
     }
   }
 
   if (foundNext) {
-    float diffHours = difftime(nextTide.timestamp, now) / 3600.0;
+  float diffHours = difftime(nextTide.timestamp, now) / 3600.0;
+  Serial.print("times following  ");
+   Serial.print(now);
+   Serial.println(nextTide.timestamp);
     Serial.printf("Time to next tide: %.2f hours (%s)\n", diffHours, nextTide.type.c_str());
   } else {
     Serial.println("No upcoming tide events found.");
   }
 
   // Sleep for 1 hour
-  esp_sleep_enable_timer_wakeup(60ULL * 1000000ULL);
+  esp_sleep_enable_timer_wakeup(1800ULL * 1000000ULL);
   Serial.println("Going to sleep...");
   delay(100);
   esp_deep_sleep_start();
